@@ -1,4 +1,5 @@
 .vimrc
 node_modules/**
 reference/**
+db/*.json
 package-lock.json
