@@ -2,6 +2,8 @@
 
 Node Express app to write, save, and delete notes in JSON format
 
+[![Note-Taker-Heroku-App-preview.png](https://i.postimg.cc/L8Zhp3Nw/Note-Taker-Heroku-App-preview.png)](https://postimg.cc/DSn7QLVP)
+
 ## Table of Contents
 - [Installation](https://github.com/johannsp/CWRUBC-Note-Taker#Installation) 
 - [Usage](https://github.com/johannsp/CWRUBC-Note-Taker#Usage) 
