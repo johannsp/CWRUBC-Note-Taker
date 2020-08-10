@@ -28,28 +28,80 @@ const dbFile = path.join(__dirname, "db/", "db.json");
 const indexHtml = path.join(__dirname, "public/", "index.html");
 const notesHtml = path.join(__dirname, "public/", "notes.html");
 
+// DB file operations
+// =============================
+//
+const readFromDB = async () => {
+  console.log('∞° readFromDB....');
+  //return [{title: "Test Title1", text: "Test Text1", id: 0}];
+  // DB file may not exit at beginning so if there is a
+  // read error return an empty array.
+  try {
+    if (fs.existsSync(dbFile)) {
+      const rawdata = await readFileAsync(dbFile)
+      const data = JSON.parse(rawdata);
+      console.log('∞° rawdata=\n"'+rawdata+'"');
+      console.log('∞° data=\n"'+data+'"');
+      // Use .map method to add a unstored id field
+      const notes = data.map((note, index) => {
+        note.id = index;
+        return note;
+      });
+      return notes;
+    }
+    else return [];
+  } catch(e) {
+    console.log('In readFromDB e.message=\n"'+e.message+'"');
+    return [];
+  }
+}
+
+const writeToDB = async (notes) => {
+  console.log('∞° writeToDB....');
+  let ok = true;
+  // Use map to remove the id from the raw data that is
+  // about to be stored
+  console.log('∞° notes=\n"'+notes+'"');
+  const rawdata = notes.map((note) => { note.title, note.text });
+  console.log('∞° rawdata=\n"'+rawdata+'"');
+  const data = JSON.stringify(rawdata);
+  console.log('∞° data=\n"'+data+'"');
+  await writeFileAsync(dbFile, data)
+    .catch(e => ok = false);
+  return ok;
+}
+
 // Routes
 // =============================
 
 // API routes send or receive Notes
 app.get("/api/notes", async (req, res) => {
   console.log('∞° GET /api/notes....');
-  let notes = [];
-  const rawdata = await readFileAsync(dbFile, req.body)
-    .catch(e => res.json(false));
-  const data = JSON.parse(rawdata);
-  console.log('∞° rawdata=\n"'+rawdata+'"');
+  const data = await readFromDB();
   console.log('∞° data=\n"'+data+'"');
+  console.log('∞° data=\n"'+JSON.stringify(data)+'"');
   res.json(data);
 });
 
 app.post("/api/notes", async (req, res) => {
   console.log('∞° POST /api/notes....');
-  const data = JSON.stringify(req.body);
-  console.log('∞° req.body=\n"'+JSON.stringify(req.body)+'"');
-  await writeFileAsync(dbFile, data)
-    .catch(e => res.json(false));
-  res.json(true);
+  let current = await readFromDB();
+  console.log('∞° current=\n"'+current+'"');
+  console.log('∞° current=\n"'+JSON.stringify(current)+'"');
+  let note = {};
+  note.title = req.body.title;
+  note.text = req.body.text;
+  note.id = current.length;
+  console.log('∞° note=\n"'+note+'"');
+  console.log('∞° note=\n"'+JSON.stringify(note)+'"');
+  current.push(note);
+  console.log('∞° current=\n"'+current+'"');
+  console.log('∞° current=\n"'+JSON.stringify(current)+'"');
+  if (await writeToDB(current)) {
+    res.json(current);
+  } else {
+    res.json(false);
+  }
 });
 
 app.delete("/api/notes/:id", async (req, res) => {
