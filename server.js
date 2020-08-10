@@ -43,8 +43,9 @@ const readFromDB = async () => {
       console.log('∞° rawdata=\n"'+rawdata+'"');
       console.log('∞° data=\n"'+data+'"');
       // Use .map method to add a unstored id field
+      // Nb. number from 1 not 1 so id can be used as boolean
       const notes = data.map((note, index) => {
-        note.id = index;
+        note.id = index + 1;
         return note;
       });
       return notes;
@@ -62,7 +63,13 @@ const writeToDB = async (notes) => {
   // Use map to remove the id from the raw data that is
   // about to be stored
   console.log('∞° notes=\n"'+notes+'"');
-  const rawdata = notes.map((note) => { note.title, note.text });
+  console.log('∞° notes=\n"'+JSON.stringify(notes)+'"');
+  const rawdata = notes.map((note) => {
+    let copy = {};
+    copy.title = note.title;
+    copy.text = note.text;
+    return copy
+  });
   console.log('∞° rawdata=\n"'+rawdata+'"');
   const data = JSON.stringify(rawdata);
   console.log('∞° data=\n"'+data+'"');
